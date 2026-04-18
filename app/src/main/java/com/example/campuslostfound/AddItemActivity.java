@@ -58,7 +58,7 @@ public class AddItemActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         btnSelectImage.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK);
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
             startActivityForResult(intent, PICK_IMAGE);
         });

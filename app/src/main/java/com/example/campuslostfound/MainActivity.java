@@ -56,7 +56,11 @@ public class MainActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Item item = doc.toObject(Item.class);
                         item.id = doc.getId();
-                        itemList.add(item);
+
+                        // Skip incomplete documents
+                        if (item.name != null && item.location != null && item.type != null) {
+                            itemList.add(item);
+                        }
                     }
 
                     adapter.notifyDataSetChanged();

@@ -36,20 +36,31 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         Item item = itemList.get(position);
 
-        holder.itemName.setText(item.name);
-        holder.itemLocation.setText("Location: " + item.location);
-        holder.itemType.setText(item.type.toUpperCase());
+        // Null-safe text setting
+        holder.itemName.setText(item.name != null ? item.name : "No Name");
+        holder.itemLocation.setText("Location: " + (item.location != null ? item.location : "Unknown"));
 
-        if (item.type.equals("lost")) {
-            holder.itemType.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+        if (item.type != null) {
+            holder.itemType.setText(item.type.toUpperCase());
+
+            if (item.type.equals("lost")) {
+                holder.itemType.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+            } else {
+                holder.itemType.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
+            }
         } else {
-            holder.itemType.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
+            holder.itemType.setText("N/A");
         }
 
+        // Image decode safe
         if (item.image != null && !item.image.isEmpty()) {
-            byte[] decodedBytes = Base64.decode(item.image, Base64.DEFAULT);
-            Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-            holder.itemImage.setImageBitmap(decodedBitmap);
+            try {
+                byte[] decodedBytes = Base64.decode(item.image, Base64.DEFAULT);
+                Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                holder.itemImage.setImageBitmap(decodedBitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
