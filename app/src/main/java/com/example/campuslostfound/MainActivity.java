@@ -2,73 +2,40 @@ package com.example.campuslostfound;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.util.ArrayList;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainActivity extends AppCompatActivity {
 
-    RecyclerView recyclerItems;
+    TabLayout tabLayout;
+    ViewPager2 viewPager;
     FloatingActionButton fabAdd;
-
-    ArrayList<Item> itemList;
-    ItemAdapter adapter;
-
-    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerItems = findViewById(R.id.recyclerItems);
+        tabLayout = findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.viewPager);
         fabAdd = findViewById(R.id.fabAdd);
 
-        recyclerItems.setLayoutManager(new LinearLayoutManager(this));
+        ViewPagerAdapter adapter = new ViewPagerAdapter(this);
+        viewPager.setAdapter(adapter);
 
-        itemList = new ArrayList<>();
-        adapter = new ItemAdapter(this, itemList);
-        recyclerItems.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(2);
 
-        db = FirebaseFirestore.getInstance();
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(position == 0 ? "Lost" : "Found")
+        ).attach();
 
-        fabAdd.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, AddItemActivity.class));
-        });
-
-        loadItems();
-    }
-
-    private void loadItems() {
-        db.collection("items")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    itemList.clear();
-
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        Item item = doc.toObject(Item.class);
-                        item.id = doc.getId();
-                        itemList.add(item);
-                    }
-
-                    adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadItems();
+        fabAdd.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, AddItemActivity.class))
+        );
     }
 }

@@ -20,6 +20,7 @@
         <activity
             android:name=".AddItemActivity"
             android:exported="false" />
+        <activity android:name=".ItemDetailActivity"/>
         <activity
             android:name=".MainActivity"
             android:exported="true" >
